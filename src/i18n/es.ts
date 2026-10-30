@@ -7,10 +7,8 @@ export const es = {
 
   'home.diagnostics': 'Teclado y diagnóstico',
   'home.diagnosticsHint': 'Conecta el teclado MIDI y comprueba que llegan las notas',
-  'home.library': 'Biblioteca',
-  'home.libraryHint': 'Importa y abre partituras MusicXML',
-  'home.practice': 'Práctica',
-  'home.practiceHint': 'Toca la partitura nota a nota',
+  'home.library': 'Biblioteca y práctica',
+  'home.libraryHint': 'Importa partituras MusicXML y practícalas',
   'home.course': 'Curso desde cero',
   'home.courseHint': 'Ejercicios de lectura progresivos',
 
@@ -113,6 +111,34 @@ export const es = {
   'practice.chordWindow': 'Acorde ≤ {ms} ms',
   'practice.keyboard': 'Teclado en pantalla',
   'practice.settings': 'Ajustes de práctica',
+
+  'course.title': 'Curso desde cero',
+  'course.intro':
+    'Aprende a leer nota a nota. Cada ejercicio tiene 16 notas: si aciertas al menos el 90 % a la primera y reconoces las notas en menos de 2 segundos, se añade una nota nueva. Las notas que más fallas o que más tardas en leer salen más a menudo.',
+  'course.track.treble': 'Clave de Sol · mano derecha',
+  'course.track.treble.hint':
+    'Empieza en el Do central, con la mano en posición de cinco dedos (Do–Sol).',
+  'course.track.bass': 'Clave de Fa · mano izquierda',
+  'course.track.bass.hint': 'Posición de cinco dedos de la mano izquierda, de Do3 a Sol3.',
+  'course.track.both': 'Las dos claves',
+  'course.track.both.hint':
+    'Mezcla todas las notas que ya conoces en Sol y en Fa, con las dos manos.',
+  'course.progress': '{n} de {total} notas',
+  'course.known': 'Notas: {list}',
+  'course.next': 'Siguiente: {note}',
+  'course.complete': 'Pista completa',
+  'course.last': 'Último ejercicio: {accuracy} %',
+  'course.start': 'Empezar',
+  'course.unknownTrack': 'Esa lección no existe.',
+
+  'lesson.ready': 'Pulsa Practicar y toca cada nota en tu teclado. Sin prisa: el cursor te espera.',
+  'lesson.passed': '¡Superado! Precisión {accuracy} % · reacción {reaction} s',
+  'lesson.failed':
+    'Precisión {accuracy} % · reacción {reaction} s. Para una nota nueva: al menos 90 % y 2 s o menos.',
+  'lesson.unlocked': 'Nota nueva desbloqueada: {note}',
+  'lesson.trackComplete': 'Has completado todas las notas de esta pista.',
+  'lesson.again': 'Otro ejercicio',
+  'lesson.backToCourse': 'Volver al curso',
 } as const;
 
 export type MessageKey = keyof typeof es;

@@ -1,0 +1,56 @@
+.intro {
+  max-width: 70ch;
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.tracks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.info {
+  flex: 1 1 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.info strong {
+  font-size: 1.15rem;
+}
+
+.meter {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: inherit;
+}
+
+.details {
+  font-weight: 600;
+}
+
+.notes {
+  font-size: 0.9rem;
+}

@@ -2,6 +2,7 @@ import Dexie, { type EntityTable } from 'dexie';
 import type { Repository } from './Repository';
 import {
   DEFAULT_SETTINGS,
+  type CourseProgress,
   type Attempt,
   type Clef,
   type NoteStat,
@@ -16,6 +17,7 @@ class SightreadDB extends Dexie {
   attempts!: EntityTable<Attempt, 'id'>;
   noteStats!: Dexie.Table<NoteStat, [number, Clef]>;
   settings!: EntityTable<SettingRow, 'key'>;
+  courseProgress!: EntityTable<CourseProgress, 'trackId'>;
 
   constructor(name: string) {
     super(name);
@@ -25,6 +27,7 @@ class SightreadDB extends Dexie {
       noteStats: '[midi+clef], lastSeen',
       settings: 'key',
     });
+    this.version(2).stores({ courseProgress: 'trackId' });
   }
 }
 
@@ -92,6 +95,14 @@ export class DexieRepository implements Repository {
 
   listNoteStats(): Promise<NoteStat[]> {
     return this.db.noteStats.toArray();
+  }
+
+  listCourseProgress(): Promise<CourseProgress[]> {
+    return this.db.courseProgress.toArray();
+  }
+
+  async putCourseProgress(progress: CourseProgress): Promise<void> {
+    await this.db.courseProgress.put(progress);
   }
 
   close(): void {

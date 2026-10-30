@@ -12,7 +12,11 @@ PWA personal para aprender a leer partituras tocando un teclado MIDI (Yamaha por
   - **Con tempo:** metrónomo Web Audio con un compás de cuenta previa, cursor que avanza solo y evaluación de cada nota con margen ajustable (pronto / tarde / se pasó / nota de más).
   - Mano derecha, izquierda o ambas (se valida solo ese pentagrama), bucle entre dos compases, teclado en pantalla opcional.
   - Cada sesión guarda un intento (precisión, duración) y, en modo espera, fallos y tiempo de reacción por nota (`noteStats`) para la futura repetición espaciada.
-- Siguiente: Fase 4 (curso desde cero).
+- **Fase 4 (curso, `/curso/`):** tres pistas —clave de Sol (mano derecha, desde Do4–Mi4), clave de Fa (mano izquierda, desde Do3–Mi3) y las dos claves (mezcla lo desbloqueado)—.
+  - Ejercicios de 16 negras generados como MusicXML y tocados en modo espera con el mismo pipeline (OSMD + `core/practice`).
+  - Desbloqueo: si un ejercicio completo tiene ≥ 90 % de aciertos a la primera y una mediana de reacción ≤ 2 s, se añade la siguiente nota de la pista (posición de cinco dedos, después hacia fuera y por último las líneas adicionales).
+  - Repetición espaciada: cada nota pesa más cuanto más se falla, más se tarda, menos se ha practicado o más tiempo hace que no sale.
+- Pendiente de la Fase 4: ejercicios de ritmo, intervalos y acordes. Siguiente gran bloque: Fase 5 (Spotify).
 
 ## Desarrollo
 
@@ -49,7 +53,7 @@ La URL será `https://sightread-trainer.pages.dev` (HTTPS, necesario para Web MI
 
 ```
 src/
-  app/          rutas (/, /diagnostico/, /biblioteca/, /pieza/?id=…, manifest)
+  app/          rutas (/, /curso/, /curso/leccion/?pista=…, /biblioteca/, /pieza/?id=…, /diagnostico/)
   components/   InputProvider, Keyboard, ScoreView (OSMD), MeasureGrid, MiniStaff, SegmentedControl…
   core/         lógica sin React, testeada con Vitest
     input/      NoteInput y sus implementaciones, parser MIDI
@@ -58,6 +62,7 @@ src/
     sync/       times(), measureAtTime(), fractionInMeasure()
     library/    importar, renombrar, piezas de ejemplo
     practice/   pasos esperados, motor de espera, evaluador de ritmo, metrónomo, estadísticas
+    exercises/  pistas del curso, generador de ejercicios, repetición espaciada, desbloqueo
     storage/    Repository + DexieRepository (IndexedDB)
   i18n/         textos (es.ts) y t()
 scripts/        generador del service worker, render de iconos

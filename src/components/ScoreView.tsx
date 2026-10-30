@@ -33,6 +33,8 @@ type Props = {
   zoom: number;
   currentMeasure: number;
   labels: MeasureLabel[];
+  /** Dibujar el título de la partitura (los ejercicios no tienen). */
+  showTitle?: boolean;
   /** Compases del bucle (incluidos), para resaltarlos. */
   loop?: { from: number; to: number } | null;
   onSelectMeasure(index: number): void;
@@ -83,6 +85,7 @@ export function ScoreView({
   zoom,
   currentMeasure,
   labels,
+  showTitle = true,
   loop,
   onSelectMeasure,
   onCursorMeasure,
@@ -111,7 +114,7 @@ export function ScoreView({
       const osmd = new OpenSheetMusicDisplay(hostRef.current, {
         autoResize: false,
         backend: 'svg',
-        drawTitle: true,
+        drawTitle: showTitle,
         drawSubtitle: false,
         drawComposer: false, // ya aparece en la biblioteca; aquí tapaba etiquetas
         drawLyricist: false,
@@ -136,7 +139,7 @@ export function ScoreView({
       osmdRef.current?.clear();
       osmdRef.current = null;
     };
-  }, [xml]);
+  }, [xml, showTitle]);
 
   /** Inicio del compás en negras, según OSMD. */
   const measureStart = useCallback((index: number) => {

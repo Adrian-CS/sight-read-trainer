@@ -14,6 +14,7 @@ import {
   waitAccuracy,
   type Range,
   type Step,
+  type StepOutcome,
 } from '@/core/practice';
 import type { ScoreModel } from '@/core/score/model';
 import { getRepository } from '@/core/storage/client';
@@ -29,7 +30,9 @@ export type Feedback = { kind: 'info' | 'ok' | 'error'; text: string };
 export type PracticeStatus = 'idle' | 'countin' | 'running' | 'finished';
 
 export type PracticeOptions = {
-  pieceId: string;
+  /** Uno de los dos: pieza de la biblioteca o ejercicio del curso. */
+  pieceId?: string;
+  exerciseId?: string;
   score: ScoreModel;
   scoreRef: RefObject<ScoreViewHandle | null>;
   mode: PracticeMode;
@@ -39,6 +42,10 @@ export type PracticeOptions = {
   toleranceMs: number;
   loop: Range | null;
   onMeasure(index: number): void;
+  /** Mensaje antes de empezar (por defecto, el de las piezas). */
+  readyText?: string;
+  /** Al terminar una sesión de espera, cuando ya se han guardado intento y estadísticas. */
+  onWaitFinished?(outcomes: StepOutcome[], completed: boolean): void;
 };
 
 const GREEN = '#1f9d55';
@@ -80,7 +87,11 @@ type TempoSession = {
 /** Sesión de práctica: conecta el motor (core/practice) con la entrada de notas y la partitura. */
 export function usePractice(options: PracticeOptions) {
   const [status, setStatus] = useState<PracticeStatus>('idle');
-  const [feedback, setFeedback] = useState<Feedback>({ kind: 'info', text: t('practice.ready') });
+  const readyText = () => opts.current.readyText ?? t('practice.ready');
+  const [feedback, setFeedback] = useState<Feedback>({
+    kind: 'info',
+    text: options.readyText ?? t('practice.ready'),
+  });
   const [counters, setCounters] = useState('');
   const [countIn, setCountIn] = useState(0);
   const session = useRef<WaitSession | TempoSession | null>(null);
@@ -108,10 +119,11 @@ export function usePractice(options: PracticeOptions) {
       tallies?: ReturnType<typeof tallyOutcomes>,
     ) => {
       const repo = getRepository();
-      const { pieceId, hand } = opts.current;
+      const { pieceId, exerciseId, hand } = opts.current;
       await repo.addAttempt({
         id: crypto.randomUUID(),
         pieceId,
+        exerciseId,
         date: Date.now(),
         accuracy,
         durationMs,
@@ -120,7 +132,9 @@ export function usePractice(options: PracticeOptions) {
       });
       const now = Date.now();
       for (const tally of tallies ?? []) {
-        repo.putNoteStat(mergeNoteStat(await repo.getNoteStat(tally.midi, tally.clef), tally, now));
+        await repo.putNoteStat(
+          mergeNoteStat(await repo.getNoteStat(tally.midi, tally.clef), tally, now),
+        );
       }
     },
     [],
@@ -137,7 +151,9 @@ export function usePractice(options: PracticeOptions) {
         const outcomes = s.engine.outcomes;
         if (outcomes.length) {
           const accuracy = waitAccuracy(outcomes);
-          void save(accuracy, durationMs, 'wait', tallyOutcomes(outcomes));
+          void save(accuracy, durationMs, 'wait', tallyOutcomes(outcomes)).then(() =>
+            opts.current.onWaitFinished?.(outcomes, completed),
+          );
           setFeedback({
             kind: completed ? 'ok' : 'info',
             text: t('practice.finished', {
@@ -146,7 +162,7 @@ export function usePractice(options: PracticeOptions) {
             }),
           });
         } else {
-          setFeedback({ kind: 'info', text: t('practice.ready') });
+          setFeedback({ kind: 'info', text: readyText() });
         }
       } else {
         cancelAnimationFrame(s.raf);
@@ -164,7 +180,7 @@ export function usePractice(options: PracticeOptions) {
             }),
           });
         } else {
-          setFeedback({ kind: 'info', text: t('practice.ready') });
+          setFeedback({ kind: 'info', text: readyText() });
         }
       }
       setStatus(completed ? 'finished' : 'idle');

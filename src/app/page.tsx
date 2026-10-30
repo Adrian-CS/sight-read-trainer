@@ -5,10 +5,9 @@ import styles from './home.module.css';
 type Entry = { href?: string; title: MessageKey; hint: MessageKey };
 
 const ENTRIES: Entry[] = [
-  { href: '/diagnostico/', title: 'home.diagnostics', hint: 'home.diagnosticsHint' },
+  { href: '/curso/', title: 'home.course', hint: 'home.courseHint' },
   { href: '/biblioteca/', title: 'home.library', hint: 'home.libraryHint' },
-  { title: 'home.practice', hint: 'home.practiceHint' },
-  { title: 'home.course', hint: 'home.courseHint' },
+  { href: '/diagnostico/', title: 'home.diagnostics', hint: 'home.diagnosticsHint' },
 ];
 
 export default function Home() {

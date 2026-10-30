@@ -66,3 +66,6 @@ export const DEFAULT_SETTINGS: Settings = {
   hand: 'both',
   samplesSeeded: false,
 };
+
+/** Progreso de una pista del curso: cuántas notas de su orden están desbloqueadas. */
+export type CourseProgress = { trackId: string; unlocked: number; updatedAt: number };

@@ -30,6 +30,8 @@ export type BuildScoreInput = {
   right: string[];
   /** Mano izquierda, clave de Fa. Omitir para un solo pentagrama. */
   left?: string[];
+  /** Clave del pentagrama único (si no hay mano izquierda). Por defecto Sol. */
+  clef?: 'G' | 'F';
 };
 
 type Token = {
@@ -113,7 +115,9 @@ export function buildMusicXml(input: BuildScoreInput): string {
         `<attributes><divisions>${DIVISIONS}</divisions><key><fifths>${input.keyFifths}</fifths></key>` +
         `<time><beats>${input.beats}</beats><beat-type>${input.beatType}</beat-type></time>` +
         (multiStaff ? '<staves>2</staves>' : '') +
-        `<clef number="1"><sign>G</sign><line>2</line></clef>` +
+        (input.clef === 'F' && !multiStaff
+          ? `<clef number="1"><sign>F</sign><line>4</line></clef>`
+          : `<clef number="1"><sign>G</sign><line>2</line></clef>`) +
         (multiStaff ? `<clef number="2"><sign>F</sign><line>4</line></clef>` : '') +
         `</attributes>`;
       if (input.tempo) {
@@ -136,7 +140,7 @@ export function buildMusicXml(input: BuildScoreInput): string {
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">\n` +
     `<score-partwise version="4.0">` +
-    `<work><work-title>${escapeXml(input.title)}</work-title></work>` +
+    (input.title ? `<work><work-title>${escapeXml(input.title)}</work-title></work>` : '') +
     (input.composer
       ? `<identification><creator type="composer">${escapeXml(input.composer)}</creator></identification>`
       : '') +

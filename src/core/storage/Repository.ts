@@ -1,4 +1,4 @@
-import type { Attempt, Clef, NoteStat, Piece, Settings } from './types';
+import type { Attempt, Clef, CourseProgress, NoteStat, Piece, Settings } from './types';
 
 /**
  * Capa de datos abstracta. La implementación actual es local (Dexie/IndexedDB);
@@ -19,4 +19,7 @@ export interface Repository {
   getNoteStat(midi: number, clef: Clef): Promise<NoteStat | undefined>;
   putNoteStat(stat: NoteStat): Promise<void>;
   listNoteStats(): Promise<NoteStat[]>;
+
+  listCourseProgress(): Promise<CourseProgress[]>;
+  putCourseProgress(progress: CourseProgress): Promise<void>;
 }
