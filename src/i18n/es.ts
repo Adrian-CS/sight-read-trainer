@@ -8,7 +8,7 @@ export const es = {
   'home.diagnostics': 'Teclado y diagnóstico',
   'home.diagnosticsHint': 'Conecta el teclado MIDI y comprueba que llegan las notas',
   'home.library': 'Biblioteca',
-  'home.libraryHint': 'Importa partituras MusicXML',
+  'home.libraryHint': 'Importa y abre partituras MusicXML',
   'home.practice': 'Práctica',
   'home.practiceHint': 'Toca la partitura nota a nota',
   'home.course': 'Curso desde cero',
@@ -42,6 +42,39 @@ export const es = {
     'Teclado del ordenador: A W S E D F T G Y H U J K = Do…Do. Z / X bajan o suben una octava (base actual: {base}).',
 
   'keyboard.label': 'Teclado en pantalla',
+
+  'library.title': 'Biblioteca',
+  'library.import': 'Importar partitura',
+  'library.importHint':
+    'Archivos .mxl, .musicxml o .xml (por ejemplo, exportados desde MuseScore).',
+  'library.importing': 'Importando…',
+  'library.imported': 'Importada: {title}',
+  'library.importError': 'No se pudo importar {name}: {message}',
+  'library.empty': 'Aún no hay piezas. Importa una partitura para empezar.',
+  'library.measures': '{count} compases',
+  'library.sample': 'Ejemplo',
+  'library.open': 'Abrir',
+  'library.rename': 'Renombrar',
+  'library.save': 'Guardar',
+  'library.cancel': 'Cancelar',
+  'library.delete': 'Borrar',
+  'library.confirmDelete': '¿Borrar "{title}"? También se borrarán sus intentos.',
+  'library.newTitle': 'Nuevo título',
+
+  'piece.notFound': 'No se encontró la pieza.',
+  'piece.loading': 'Cargando partitura…',
+  'piece.renderError': 'No se pudo mostrar la partitura: {message}',
+  'piece.mode': 'Vista',
+  'piece.mode.score': 'Partitura',
+  'piece.mode.measures': 'Compases',
+  'piece.measure': 'Compás {n}',
+  'piece.measureOf': 'Compás {n} de {total}',
+  'piece.tempo': 'tempo {bpm}',
+  'piece.prevNote': 'Nota anterior',
+  'piece.nextNote': 'Nota siguiente',
+  'piece.zoomIn': 'Ampliar',
+  'piece.zoomOut': 'Reducir',
+  'piece.manualMark': 'Marca manual',
 } as const;
 
 export type MessageKey = keyof typeof es;

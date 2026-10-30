@@ -1,0 +1,66 @@
+/* La partitura siempre va sobre "papel" claro: OSMD dibuja en negro. */
+.paper {
+  background: #fdfcf8;
+  color: #1d1b18;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 8px 0 24px;
+  min-height: 240px;
+  overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  .paper {
+    background: #e9e6de;
+  }
+}
+
+.stage {
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.measure {
+  position: absolute;
+  pointer-events: auto;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.measure.current {
+  background: rgba(47, 111, 223, 0.1);
+  outline: 2px solid rgba(47, 111, 223, 0.5);
+}
+
+.label {
+  position: absolute;
+  left: 4px;
+  top: -2px;
+  transform: translateY(-100%);
+  font-size: 0.7rem;
+  line-height: 1;
+  color: #6b665e;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.current .label {
+  color: #2f6fdf;
+  font-weight: 700;
+}
+
+.message {
+  padding: 24px;
+  margin: 0;
+  color: #6b665e;
+}

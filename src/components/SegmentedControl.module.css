@@ -1,0 +1,24 @@
+.group {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: var(--radius);
+  background: var(--border);
+  gap: 4px;
+}
+
+.option {
+  min-height: calc(var(--tap) - 8px);
+  padding: 0 20px;
+  border: 0;
+  border-radius: calc(var(--radius) - 4px);
+  background: transparent;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.selected {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}

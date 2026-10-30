@@ -6,7 +6,8 @@ PWA personal para aprender a leer partituras tocando un teclado MIDI (Yamaha por
 
 - **Fase 0 (base):** Next.js (App Router, export estático) + TypeScript, PWA instalable y sin conexión, tema claro/oscuro automático, ESLint + Prettier, Vitest, CI en GitHub Actions y despliegue en Cloudflare Pages.
 - **Fase 1 (MIDI):** abstracción `NoteInput` con `MidiInput`, `OnScreenKeyboardInput` y `ComputerKeyboardInput`; selección y recuerdo del dispositivo; reconexión al desenchufar/enchufar; pantalla de diagnóstico en `/diagnostico/`.
-- Siguiente: Fase 2 (visor MusicXML con OSMD).
+- **Fase 2 (visor):** importación de `.mxl`/`.musicxml`/`.xml` (JSZip), biblioteca local (abrir, renombrar, borrar) con 3 piezas de ejemplo de dominio público, render con OSMD (carga diferida) con cursor, zoom adaptado al ancho y compases seleccionables, y toggle **Partitura / Compases** que comparte cursor y compás actual. Cada compás muestra su número y su tiempo de inicio (calculado con `core/sync`, ⚑ si es una marca manual).
+- Siguiente: Fase 3 (práctica en modo espera).
 
 ## Desarrollo
 
@@ -41,11 +42,14 @@ La URL será `https://sightread-trainer.pages.dev` (HTTPS, necesario para Web MI
 
 ```
 src/
-  app/          rutas (/, /diagnostico/, manifest)
-  components/   InputProvider (contexto de entradas), Keyboard, MidiPanel, NoteMonitor
+  app/          rutas (/, /diagnostico/, /biblioteca/, /pieza/?id=…, manifest)
+  components/   InputProvider, Keyboard, ScoreView (OSMD), MeasureGrid, MiniStaff, SegmentedControl…
   core/         lógica sin React, testeada con Vitest
     input/      NoteInput y sus implementaciones, parser MIDI
     music/      utilidades de notas (número MIDI ↔ nombre)
+    score/      lectura de archivos, modelo de partitura, constructor de MusicXML, piezas de ejemplo
+    sync/       times(), measureAtTime(), fractionInMeasure()
+    library/    importar, renombrar, piezas de ejemplo
     storage/    Repository + DexieRepository (IndexedDB)
   i18n/         textos (es.ts) y t()
 scripts/        generador del service worker, render de iconos

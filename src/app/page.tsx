@@ -6,7 +6,7 @@ type Entry = { href?: string; title: MessageKey; hint: MessageKey };
 
 const ENTRIES: Entry[] = [
   { href: '/diagnostico/', title: 'home.diagnostics', hint: 'home.diagnosticsHint' },
-  { title: 'home.library', hint: 'home.libraryHint' },
+  { href: '/biblioteca/', title: 'home.library', hint: 'home.libraryHint' },
   { title: 'home.practice', hint: 'home.practiceHint' },
   { title: 'home.course', hint: 'home.courseHint' },
 ];

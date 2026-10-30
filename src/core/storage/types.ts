@@ -14,6 +14,10 @@ export type SyncData = {
 export type Piece = {
   id: string;
   title: string;
+  composer?: string;
+  measureCount?: number;
+  /** Piezas incluidas con la app (se pueden borrar y renombrar igual). */
+  sampleId?: string;
   musicXml: string | Blob;
   createdAt: number;
   spotify?: { trackId: string; startMs: number; endMs: number };
@@ -44,6 +48,8 @@ export type Settings = {
   chordWindowMs: number;
   theme: 'auto' | 'light' | 'dark';
   hand: Hand;
+  /** Ya se añadieron las piezas de ejemplo (para no volver a crearlas si se borran). */
+  samplesSeeded: boolean;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -51,4 +57,5 @@ export const DEFAULT_SETTINGS: Settings = {
   chordWindowMs: 150,
   theme: 'auto',
   hand: 'both',
+  samplesSeeded: false,
 };
