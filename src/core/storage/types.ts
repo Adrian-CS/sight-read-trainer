@@ -23,6 +23,8 @@ export type Piece = {
   spotify?: { trackId: string; startMs: number; endMs: number };
   sync?: SyncData;
   hand: Hand;
+  /** Tempo elegido para practicar con metrónomo (negras por minuto). */
+  practiceBpm?: number;
 };
 
 export type Attempt = {
@@ -32,6 +34,8 @@ export type Attempt = {
   date: number;
   accuracy: number;
   durationMs: number;
+  mode?: 'wait' | 'tempo';
+  hand?: Hand;
 };
 
 export type NoteStat = {
@@ -46,6 +50,8 @@ export type NoteStat = {
 export type Settings = {
   midiDevice: MidiDeviceRef | null;
   chordWindowMs: number;
+  /** Margen para dar por buena una nota en el modo con tempo. */
+  tempoToleranceMs: number;
   theme: 'auto' | 'light' | 'dark';
   hand: Hand;
   /** Ya se añadieron las piezas de ejemplo (para no volver a crearlas si se borran). */
@@ -55,6 +61,7 @@ export type Settings = {
 export const DEFAULT_SETTINGS: Settings = {
   midiDevice: null,
   chordWindowMs: 150,
+  tempoToleranceMs: 150,
   theme: 'auto',
   hand: 'both',
   samplesSeeded: false,

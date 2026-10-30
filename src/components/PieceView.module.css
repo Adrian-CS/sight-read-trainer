@@ -2,17 +2,21 @@
   padding-bottom: 48px;
 }
 
-.toolbar {
+.sticky {
   position: sticky;
   top: 0;
   z-index: 5;
+  background: var(--bg);
+  padding-bottom: 4px;
+}
+
+.toolbar {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
   padding: 8px 0;
-  margin-bottom: 8px;
-  background: var(--bg);
+  margin-bottom: 4px;
 }
 
 .position {
@@ -25,4 +29,19 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+.withKeyboard {
+  padding-bottom: calc(clamp(140px, 30vh, 240px) + 32px);
+}
+
+.keyboard {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+  background: var(--bg);
+  border-top: 1px solid var(--border);
 }

@@ -12,11 +12,19 @@ type Props = {
   labels: MeasureLabel[];
   currentMeasure: number;
   visible: boolean;
+  loop?: { from: number; to: number } | null;
   onSelectMeasure(index: number): void;
 };
 
 /** Cuadrícula de 4 columnas con un mini pentagrama y el tiempo de inicio de cada compás. */
-export function MeasureGrid({ score, labels, currentMeasure, visible, onSelectMeasure }: Props) {
+export function MeasureGrid({
+  score,
+  labels,
+  currentMeasure,
+  visible,
+  loop,
+  onSelectMeasure,
+}: Props) {
   const gridRef = useRef<HTMLOListElement>(null);
 
   // Mantener visible el compás actual (p. ej. al volver desde la vista de partitura).
@@ -32,7 +40,9 @@ export function MeasureGrid({ score, labels, currentMeasure, visible, onSelectMe
         <li key={i}>
           <button
             type="button"
-            className={`${styles.cell} ${i === currentMeasure ? styles.current : ''}`}
+            className={`${styles.cell} ${i === currentMeasure ? styles.current : ''} ${
+              loop && i >= loop.from && i <= loop.to ? styles.inLoop : ''
+            }`}
             aria-pressed={i === currentMeasure}
             aria-label={t('piece.measure', { n: labels[i]?.number ?? i + 1 })}
             onClick={() => onSelectMeasure(i)}

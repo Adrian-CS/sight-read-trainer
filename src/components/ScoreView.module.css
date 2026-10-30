@@ -36,6 +36,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.measure.inLoop {
+  box-shadow: inset 0 -4px 0 rgba(214, 138, 31, 0.75);
+}
+
 .measure.current {
   background: rgba(47, 111, 223, 0.1);
   outline: 2px solid rgba(47, 111, 223, 0.5);

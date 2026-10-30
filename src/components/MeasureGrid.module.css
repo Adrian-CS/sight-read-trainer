@@ -21,6 +21,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.cell.inLoop {
+  border-bottom: 4px solid #d68a1f;
+}
+
 .cell.current {
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent) inset;

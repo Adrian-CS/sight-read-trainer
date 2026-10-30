@@ -7,7 +7,12 @@ PWA personal para aprender a leer partituras tocando un teclado MIDI (Yamaha por
 - **Fase 0 (base):** Next.js (App Router, export estático) + TypeScript, PWA instalable y sin conexión, tema claro/oscuro automático, ESLint + Prettier, Vitest, CI en GitHub Actions y despliegue en Cloudflare Pages.
 - **Fase 1 (MIDI):** abstracción `NoteInput` con `MidiInput`, `OnScreenKeyboardInput` y `ComputerKeyboardInput`; selección y recuerdo del dispositivo; reconexión al desenchufar/enchufar; pantalla de diagnóstico en `/diagnostico/`.
 - **Fase 2 (visor):** importación de `.mxl`/`.musicxml`/`.xml` (JSZip), biblioteca local (abrir, renombrar, borrar) con 3 piezas de ejemplo de dominio público, render con OSMD (carga diferida) con cursor, zoom adaptado al ancho y compases seleccionables, y toggle **Partitura / Compases** que comparte cursor y compás actual. Cada compás muestra su número y su tiempo de inicio (calculado con `core/sync`, ⚑ si es una marca manual).
-- Siguiente: Fase 3 (práctica en modo espera).
+- **Fase 3 (práctica):** en la vista de pieza.
+  - **Espera:** el cursor solo avanza con la(s) nota(s) correcta(s); acordes dentro de una ventana configurable (150 ms por defecto); verde al acertar, rojo al fallar y mensaje con lo que se tocó y lo que se esperaba.
+  - **Con tempo:** metrónomo Web Audio con un compás de cuenta previa, cursor que avanza solo y evaluación de cada nota con margen ajustable (pronto / tarde / se pasó / nota de más).
+  - Mano derecha, izquierda o ambas (se valida solo ese pentagrama), bucle entre dos compases, teclado en pantalla opcional.
+  - Cada sesión guarda un intento (precisión, duración) y, en modo espera, fallos y tiempo de reacción por nota (`noteStats`) para la futura repetición espaciada.
+- Siguiente: Fase 4 (curso desde cero).
 
 ## Desarrollo
 
@@ -19,6 +24,8 @@ npm run lint && npm run typecheck && npm run format:check
 npm run build        # export estático en out/ + out/sw.js
 npm start            # sirve out/ para probar la PWA
 ```
+
+Limitaciones conocidas de la práctica: las repeticiones (`:|`) no se expanden y las notas de adorno no se evalúan.
 
 Sin el Yamaha: usa el teclado en pantalla o el del ordenador (`A W S E D F T G Y H U J K O L P Ñ` = Do4…Mi5; `Z`/`X` cambian de octava).
 
@@ -50,6 +57,7 @@ src/
     score/      lectura de archivos, modelo de partitura, constructor de MusicXML, piezas de ejemplo
     sync/       times(), measureAtTime(), fractionInMeasure()
     library/    importar, renombrar, piezas de ejemplo
+    practice/   pasos esperados, motor de espera, evaluador de ritmo, metrónomo, estadísticas
     storage/    Repository + DexieRepository (IndexedDB)
   i18n/         textos (es.ts) y t()
 scripts/        generador del service worker, render de iconos

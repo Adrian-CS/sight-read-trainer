@@ -9,7 +9,16 @@ export type ScoreViewHandle = {
   next(): void;
   previous(): void;
   toMeasure(index: number): void;
+  /** Coloca el cursor en un instante (negras desde el inicio del compás). */
+  toPosition(measure: number, onset: number): void;
+  /** Colorea las notas con esas teclas que empiezan en ese instante. */
+  colorNotes(measure: number, onset: number, midis: number[], color: string): void;
+  clearColors(): void;
 };
+
+/** OSMD guarda la altura en semitonos con Do4 = 48; en MIDI Do4 = 60. */
+const OSMD_HALFTONE_TO_MIDI = 12;
+const EPS = 1e-6;
 
 export type MeasureLabel = { number: string; time: string; manual: boolean };
 
@@ -24,6 +33,8 @@ type Props = {
   zoom: number;
   currentMeasure: number;
   labels: MeasureLabel[];
+  /** Compases del bucle (incluidos), para resaltarlos. */
+  loop?: { from: number; to: number } | null;
   onSelectMeasure(index: number): void;
   onCursorMeasure(index: number): void;
 };
@@ -72,6 +83,7 @@ export function ScoreView({
   zoom,
   currentMeasure,
   labels,
+  loop,
   onSelectMeasure,
   onCursorMeasure,
 }: Props) {
@@ -82,7 +94,7 @@ export function ScoreView({
   const [error, setError] = useState<string | null>(null);
   const [boxes, setBoxes] = useState<Box[]>([]);
   const rendered = useRef({ width: 0, zoom: 0 });
-  /** Posición del cursor como instante absoluto, para restaurarla tras volver a maquetar. */
+  /** Posición del cursor en negras desde el inicio, para restaurarla tras volver a maquetar. */
   const cursorTime = useRef(0);
   const callbacks = useRef({ onCursorMeasure });
   useEffect(() => {
@@ -126,19 +138,29 @@ export function ScoreView({
     };
   }, [xml]);
 
-  const seek = useCallback((until: (time: number, measure: number) => boolean) => {
+  /** Inicio del compás en negras, según OSMD. */
+  const measureStart = useCallback((index: number) => {
+    const m = osmdRef.current?.Sheet.SourceMeasures[index];
+    return m ? m.AbsoluteTimestamp.RealValue * 4 : 0;
+  }, []);
+
+  /**
+   * Mueve el cursor a la primera entrada con instante >= target (negras desde el inicio).
+   * Avanza desde la posición actual si puede, y solo redibuja el cursor una vez.
+   */
+  const seek = useCallback((target: number) => {
     const cursor = osmdRef.current?.cursor;
     if (!cursor) return;
-    cursor.reset();
-    while (
-      !cursor.Iterator.EndReached &&
-      !until(cursor.Iterator.CurrentSourceTimestamp.RealValue, cursor.Iterator.CurrentMeasureIndex)
-    ) {
-      cursor.next();
-    }
-    if (cursor.Iterator.EndReached) cursor.previous();
-    cursorTime.current = cursor.Iterator.CurrentSourceTimestamp.RealValue;
+    const it = cursor.Iterator;
+    const now = () => it.CurrentSourceTimestamp.RealValue * 4;
+    if (it.EndReached || now() > target + EPS) cursor.resetIterator();
+    while (!cursor.Iterator.EndReached && now() < target - EPS) cursor.Iterator.moveToNext();
+    if (cursor.Iterator.EndReached) cursor.Iterator.moveToPrevious();
+    cursor.update();
+    cursorTime.current = cursor.Iterator.CurrentSourceTimestamp.RealValue * 4;
   }, []);
+
+  const colored = useRef(new Set<SVGElement>());
 
   const layout = useCallback(() => {
     const osmd = osmdRef.current;
@@ -152,8 +174,8 @@ export function ScoreView({
       osmd.render();
       rendered.current = { width, zoom: z };
       osmd.cursor.show();
-      const time = cursorTime.current;
-      seek((now) => now >= time - 1e-9);
+      colored.current.clear(); // el render nuevo crea otros elementos SVG
+      seek(cursorTime.current);
       setBoxes(measureBoxes(osmd, host));
     } catch (err) {
       setError((err as Error).message);
@@ -179,37 +201,66 @@ export function ScoreView({
     };
   }, [layout]);
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      next() {
-        const cursor = osmdRef.current?.cursor;
-        if (!cursor || cursor.Iterator.EndReached) return;
+  useImperativeHandle(ref, () => {
+    const step = (dir: 1 | -1) => {
+      const cursor = osmdRef.current?.cursor;
+      if (!cursor) return;
+      if (dir === 1) {
+        if (cursor.Iterator.EndReached) return;
         cursor.next();
         if (cursor.Iterator.EndReached) cursor.previous();
-        cursorTime.current = cursor.Iterator.CurrentSourceTimestamp.RealValue;
-        callbacks.current.onCursorMeasure(cursor.Iterator.CurrentMeasureIndex);
-      },
-      previous() {
-        const cursor = osmdRef.current?.cursor;
-        if (!cursor || cursor.Iterator.CurrentSourceTimestamp.RealValue <= 0) return;
+      } else {
+        if (cursor.Iterator.CurrentSourceTimestamp.RealValue <= 0) return;
         cursor.previous();
-        cursorTime.current = cursor.Iterator.CurrentSourceTimestamp.RealValue;
-        callbacks.current.onCursorMeasure(cursor.Iterator.CurrentMeasureIndex);
-      },
-      toMeasure(index: number) {
-        if (!osmdRef.current) return;
-        // Antes del primer render solo se recuerda; se aplica al maquetar.
-        if (!rendered.current.width) {
-          const sheet = osmdRef.current.Sheet;
-          cursorTime.current = sheet.SourceMeasures[index]?.AbsoluteTimestamp.RealValue ?? 0;
-          return;
+      }
+      cursorTime.current = cursor.Iterator.CurrentSourceTimestamp.RealValue * 4;
+      callbacks.current.onCursorMeasure(cursor.Iterator.CurrentMeasureIndex);
+    };
+    const goTo = (measure: number, onset: number) => {
+      if (!osmdRef.current) return;
+      // Antes del primer render solo se recuerda; se aplica al maquetar.
+      if (!rendered.current.width) cursorTime.current = measureStart(measure) + onset;
+      else seek(measureStart(measure) + onset);
+    };
+    return {
+      next: () => step(1),
+      previous: () => step(-1),
+      toMeasure: (index) => goTo(index, 0),
+      toPosition: goTo,
+      colorNotes(measure, onset, midis, color) {
+        const osmd = osmdRef.current;
+        if (!osmd || !rendered.current.width) return;
+        for (const gm of osmd.GraphicSheet.MeasureList[measure] ?? []) {
+          for (const entry of gm?.staffEntries ?? []) {
+            if (Math.abs(entry.relInMeasureTimestamp.RealValue * 4 - onset) > EPS) continue;
+            for (const ve of entry.graphicalVoiceEntries) {
+              for (const gn of ve.notes) {
+                const note = gn.sourceNote;
+                if (note.isRest() || !midis.includes(note.halfTone + OSMD_HALFTONE_TO_MIDI))
+                  continue;
+                const g = (
+                  gn as unknown as { getSVGGElement?: () => SVGGElement }
+                ).getSVGGElement?.();
+                if (!g) continue;
+                g.querySelectorAll<SVGElement>('path, rect').forEach((el) => {
+                  el.style.fill = color;
+                  el.style.stroke = color;
+                  colored.current.add(el);
+                });
+              }
+            }
+          }
         }
-        seek((_, measure) => measure >= index);
       },
-    }),
-    [seek],
-  );
+      clearColors() {
+        colored.current.forEach((el) => {
+          el.style.fill = '';
+          el.style.stroke = '';
+        });
+        colored.current.clear();
+      },
+    };
+  }, [seek, measureStart]);
 
   return (
     <div className={styles.paper} ref={wrapRef} hidden={!visible}>
@@ -227,7 +278,9 @@ export function ScoreView({
               <button
                 key={i}
                 type="button"
-                className={`${styles.measure} ${i === currentMeasure ? styles.current : ''}`}
+                className={`${styles.measure} ${i === currentMeasure ? styles.current : ''} ${
+                  loop && i >= loop.from && i <= loop.to ? styles.inLoop : ''
+                }`}
                 style={box}
                 aria-label={t('piece.measure', { n: labels[i]?.number ?? i + 1 })}
                 aria-pressed={i === currentMeasure}

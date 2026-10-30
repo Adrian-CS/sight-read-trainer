@@ -1,0 +1,24 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.on {
+  color: var(--ok);
+}
+
+.off {
+  color: var(--error);
+}
+
+.connect {
+  min-height: 40px;
+  font-size: 0.9rem;
+}
