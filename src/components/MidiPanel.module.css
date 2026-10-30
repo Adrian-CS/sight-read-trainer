@@ -1,0 +1,35 @@
+.panel {
+  margin-bottom: 16px;
+}
+
+.panel h2 {
+  font-size: 1.1rem;
+  margin: 0 0 12px;
+}
+
+.panel p {
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ok {
+  color: var(--ok);
+  font-weight: 600;
+}
+
+.off {
+  color: var(--error);
+  font-weight: 600;
+}

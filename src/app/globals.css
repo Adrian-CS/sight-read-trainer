@@ -1,0 +1,126 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --text: #1d1b18;
+  --muted: #6b665e;
+  --border: #ddd8cf;
+  --accent: #2f6fdf;
+  --on-accent: #ffffff;
+  --ok: #1f9d55;
+  --error: #d64545;
+  --warn-bg: #fff4d6;
+  --key-white: #ffffff;
+  --key-black: #222222;
+  --key-border: #9a958c;
+  --radius: 14px;
+  --tap: 56px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15171a;
+    --surface: #1f2226;
+    --text: #ecebe8;
+    --muted: #9da3ab;
+    --border: #33373d;
+    --accent: #5b93f5;
+    --on-accent: #0b1020;
+    --warn-bg: #3a3220;
+    --key-white: #e9e7e2;
+    --key-black: #0c0d0f;
+    --key-border: #4a4f57;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 18px;
+  -webkit-text-size-adjust: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+.btn {
+  min-height: var(--tap);
+  padding: 0 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.select {
+  min-height: var(--tap);
+  padding: 0 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  max-width: 100%;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px 32px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: var(--tap);
+  margin-bottom: 16px;
+}
+
+.topbar h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.notice {
+  background: var(--warn-bg);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  line-height: 1.4;
+}
+
+.muted {
+  color: var(--muted);
+}
