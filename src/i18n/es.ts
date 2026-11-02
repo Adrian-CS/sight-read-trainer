@@ -90,6 +90,8 @@ export const es = {
   'practice.partial': '{note} ✓ — sigue con el resto del acorde',
   'practice.correct': '¡Bien!',
   'practice.wrong': 'Tocaste {played} · era {expected}',
+  'practice.wrongTryAgain': 'Tocaste {played} · vuelve a mirar y prueba otra vez',
+  'practice.readAndPlay': 'Lee y toca',
   'practice.countIn': 'Preparados… {n}',
   'practice.hit': '{note} a tiempo',
   'practice.early': '{note} pronto ({ms} ms)',
@@ -114,7 +116,7 @@ export const es = {
 
   'course.title': 'Curso desde cero',
   'course.intro':
-    'Aprende a leer nota a nota. Cada ejercicio tiene 16 notas: si aciertas al menos el 90 % a la primera y reconoces las notas en menos de 2 segundos, se añade una nota nueva. Las notas que más fallas o que más tardas en leer salen más a menudo.',
+    'Empieza por la lectura de notas: cada ejercicio tiene 16 notas y, si aciertas al menos el 90 % a la primera y las reconoces en menos de 2 segundos, se añade una nota nueva. Las que más fallas o más tardas en leer salen más a menudo. Ritmo, intervalos y acordes avanzan por niveles con la misma idea.',
   'course.track.treble': 'Clave de Sol · mano derecha',
   'course.track.treble.hint':
     'Empieza en el Do central, con la mano en posición de cinco dedos (Do–Sol).',
@@ -123,6 +125,19 @@ export const es = {
   'course.track.both': 'Las dos claves',
   'course.track.both.hint':
     'Mezcla todas las notas que ya conoces en Sol y en Fa, con las dos manos.',
+  'course.track.rhythm': 'Ritmo',
+  'course.track.rhythm.hint':
+    'Figuras sobre una sola tecla, con metrónomo. Vale cualquier tecla: lo que cuenta es cuándo suena.',
+  'course.track.intervals': 'Intervalos',
+  'course.track.intervals.hint':
+    'Dos notas a la vez. Aprende a reconocer la distancia por su forma: línea-línea, línea-espacio…',
+  'course.track.chords': 'Acordes',
+  'course.track.chords.hint':
+    'Tríadas de tres notas. En posición fundamental se ven como tres líneas o tres espacios seguidos.',
+  'course.section.notes': 'Lectura de notas',
+  'course.section.more': 'Ritmo, intervalos y acordes',
+  'course.level': 'Nivel {n} de {total}: {name}',
+  'course.nextLevel': 'Siguiente: {name}',
   'course.progress': '{n} de {total} notas',
   'course.known': 'Notas: {list}',
   'course.next': 'Siguiente: {note}',
@@ -132,11 +147,33 @@ export const es = {
   'course.unknownTrack': 'Esa lección no existe.',
 
   'lesson.ready': 'Pulsa Practicar y toca cada nota en tu teclado. Sin prisa: el cursor te espera.',
+  'lesson.ready.rhythm':
+    'Pulsa Practicar: suena un compás de metrónomo y después toca cada figura en su tiempo. Vale cualquier tecla.',
+  'lesson.ready.harmony':
+    'Pulsa Practicar y toca a la vez todas las notas de cada intervalo o acorde.',
+  'lesson.passedRhythm': '¡Superado! Aciertos {accuracy} % · desviación media {ms} ms',
+  'lesson.failedRhythm':
+    'Aciertos {accuracy} % · desviación media {ms} ms. Para subir de nivel: al menos 90 % y 90 ms o menos.',
+  'lesson.failedHarmony':
+    'Precisión {accuracy} % · reacción {reaction} s. Para subir de nivel: al menos 90 % y 3 s o menos.',
+  'lesson.levelUp': 'Nivel nuevo: {name}',
+
+  'level.rhythm.1': 'redondas, blancas y negras',
+  'level.rhythm.2': '+ silencios',
+  'level.rhythm.3': '+ corcheas',
+  'level.rhythm.4': '+ figuras con puntillo',
+  'level.rhythm.5': '+ semicorcheas',
+  'level.intervals.1': 'terceras y quintas',
+  'level.intervals.2': '+ segundas y cuartas',
+  'level.intervals.3': '+ sextas, séptimas y octavas',
+  'level.chords.1': 'Do, Fa y Sol mayor',
+  'level.chords.2': '+ La, Re y Mi menor',
+  'level.chords.3': '+ inversiones',
+
   'lesson.passed': '¡Superado! Precisión {accuracy} % · reacción {reaction} s',
   'lesson.failed':
     'Precisión {accuracy} % · reacción {reaction} s. Para una nota nueva: al menos 90 % y 2 s o menos.',
   'lesson.unlocked': 'Nota nueva desbloqueada: {note}',
-  'lesson.trackComplete': 'Has completado todas las notas de esta pista.',
   'lesson.again': 'Otro ejercicio',
   'lesson.backToCourse': 'Volver al curso',
 } as const;

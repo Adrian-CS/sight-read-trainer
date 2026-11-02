@@ -160,6 +160,13 @@ describe('TempoEvaluator', () => {
     expect(ev.noteOn(60, 500).type).toBe('hit');
   });
 
+  it('con anyKey acepta cualquier tecla, pero no dos para la misma nota', () => {
+    const ev = new TempoEvaluator(steps, { toleranceMs: 100, msPerQuarter: 500, anyKey: true });
+    ev.addPass(0);
+    expect(ev.noteOn(50, 10)).toMatchObject({ type: 'hit', note: { midi: 60 } });
+    expect(ev.noteOn(51, 20).type).toBe('extra');
+  });
+
   it('encadena pasadas para el bucle', () => {
     const one = buildSteps(twoHands, 'right', { from: 1, to: 1 });
     const ev = new TempoEvaluator(one, { toleranceMs: 100, msPerQuarter: 500 });

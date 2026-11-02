@@ -33,7 +33,13 @@ export class TempoEvaluator {
   constructor(
     private readonly steps: Step[],
     /** origin: instante (negras desde el inicio de la pieza) que corresponde a cada `startAt`. */
-    private readonly options: { toleranceMs: number; msPerQuarter: number; origin?: number },
+    /** anyKey: vale cualquier tecla (ejercicios de ritmo sobre una sola nota). */
+    private readonly options: {
+      toleranceMs: number;
+      msPerQuarter: number;
+      origin?: number;
+      anyKey?: boolean;
+    },
   ) {}
 
   /** Añade una pasada por los pasos empezando en `startAt` (ms, base performance.now()). */
@@ -53,7 +59,8 @@ export class TempoEvaluator {
     let best = -1;
     for (let i = 0; i < this.pending.length; i++) {
       const p = this.pending[i];
-      if (p.midi !== midi || Math.abs(p.expectedAt - time) > tol) continue;
+      if ((!this.options.anyKey && p.midi !== midi) || Math.abs(p.expectedAt - time) > tol)
+        continue;
       if (
         best < 0 ||
         Math.abs(p.expectedAt - time) < Math.abs(this.pending[best].expectedAt - time)

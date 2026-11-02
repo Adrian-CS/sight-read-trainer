@@ -125,12 +125,12 @@ describe('course', () => {
   it('crea ejercicios y desbloquea una nota por ejercicio superado', async () => {
     repo = new DexieRepository(`course-${n++}`);
     const ex = await createExercise(repo, 'treble', seededRng(3));
-    expect(ex.sequence).toHaveLength(EXERCISE_LENGTH);
-    expect(new Set(ex.sequence.map((s) => s.midi))).toEqual(new Set([60, 62, 64]));
+    expect(ex.sequence!).toHaveLength(EXERCISE_LENGTH);
+    expect(new Set(ex.sequence!.map((s) => s.midi))).toEqual(new Set([60, 62, 64]));
 
     expect((await completeExercise(repo, 'treble', outcomes(16, 5))).unlocked).toBeNull();
     const first = await completeExercise(repo, 'treble', outcomes(16));
-    expect(first.unlocked).toEqual({ midi: 65, clef: 'treble' });
+    expect(first.unlocked).toEqual({ kind: 'note', midi: 65 });
     await completeExercise(repo, 'treble', outcomes(16));
     expect((await loadProgress(repo)).treble?.unlocked).toBe(5);
     expect(trackPool('treble', await loadProgress(repo)).map((p) => p.midi)).toEqual([

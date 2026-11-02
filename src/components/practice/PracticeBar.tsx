@@ -19,6 +19,8 @@ type Props = {
   simple?: boolean;
   status: PracticeStatus;
   feedback: Feedback;
+  /** Notas del paso actual (solo como atributo, para pruebas automáticas). */
+  expected?: number[];
   counters: string;
   countIn: number;
   mode: PracticeMode;
@@ -86,6 +88,30 @@ export function PracticeBar(p: Props) {
             {t('practice.keyboard')}
           </label>
         )}
+        {p.simple && p.mode === 'tempo' && (
+          <fieldset className={`${styles.fieldset}`} disabled={active}>
+            <span className={styles.group}>
+              <span className="muted">{t('practice.bpm')}</span>
+              <button
+                type="button"
+                className="btn btn-icon"
+                aria-label={t('practice.slower')}
+                onClick={() => p.onBpm(Math.max(BPM_MIN, p.bpm - 4))}
+              >
+                −
+              </button>
+              <output className={styles.bpm}>{p.bpm}</output>
+              <button
+                type="button"
+                className="btn btn-icon"
+                aria-label={t('practice.faster')}
+                onClick={() => p.onBpm(Math.min(BPM_MAX, p.bpm + 4))}
+              >
+                +
+              </button>
+            </span>
+          </fieldset>
+        )}
         <MidiStatusChip />
         {active ? (
           <button type="button" className={`btn ${styles.main} ${styles.stop}`} onClick={p.onStop}>
@@ -99,7 +125,12 @@ export function PracticeBar(p: Props) {
       </div>
 
       <div className={styles.row}>
-        <p className={`${styles.feedback} ${feedbackClass}`} role="status" aria-live="polite">
+        <p
+          className={`${styles.feedback} ${feedbackClass}`}
+          role="status"
+          aria-live="polite"
+          data-expected={p.expected?.join(',')}
+        >
           {p.status === 'countin' ? t('practice.countIn', { n: p.countIn }) : p.feedback.text}
         </p>
         {p.counters && <span className={`muted ${styles.counters}`}>{p.counters}</span>}

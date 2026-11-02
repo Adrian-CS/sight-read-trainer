@@ -15,6 +15,7 @@ import {
   type Range,
   type Step,
   type StepOutcome,
+  type TempoSummary,
 } from '@/core/practice';
 import type { ScoreModel } from '@/core/score/model';
 import { getRepository } from '@/core/storage/client';
@@ -44,6 +45,14 @@ export type PracticeOptions = {
   onMeasure(index: number): void;
   /** Mensaje antes de empezar (por defecto, el de las piezas). */
   readyText?: string;
+  /** Mostrar qué notas tocar. En el curso se ocultan hasta el segundo fallo del mismo paso. */
+  revealExpected?: boolean;
+  /** Nombre de lo que suena en un paso (intervalo, acorde), para mostrarlo al acertar. */
+  stepName?(step: Step): string | undefined;
+  /** Modo con tempo: cualquier tecla vale (ritmo sobre una sola nota). */
+  anyKey?: boolean;
+  /** Al terminar una sesión con tempo, cuando ya se ha guardado el intento. */
+  onTempoFinished?(summary: TempoSummary, completed: boolean): void;
   /** Al terminar una sesión de espera, cuando ya se han guardado intento y estadísticas. */
   onWaitFinished?(outcomes: StepOutcome[], completed: boolean): void;
 };
@@ -65,6 +74,8 @@ type WaitSession = {
   startedAt: number;
   ok: number;
   errors: number;
+  /** Fallos en el paso actual. */
+  stepErrors: number;
 };
 type TempoSession = {
   kind: 'tempo';
@@ -88,12 +99,12 @@ type TempoSession = {
 export function usePractice(options: PracticeOptions) {
   const [status, setStatus] = useState<PracticeStatus>('idle');
   const readyText = () => opts.current.readyText ?? t('practice.ready');
-  const [feedback, setFeedback] = useState<Feedback>({
-    kind: 'info',
-    text: options.readyText ?? t('practice.ready'),
-  });
+  /** null = aún no se ha practicado: se muestra el texto inicial de las opciones actuales. */
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [counters, setCounters] = useState('');
   const [countIn, setCountIn] = useState(0);
+  /** Notas del paso actual en modo espera (para pruebas: atributo data-expected). */
+  const [expected, setExpected] = useState<number[]>([]);
   const session = useRef<WaitSession | TempoSession | null>(null);
   /** Compás desde el que se empieza cuando no hay bucle. */
   const startMeasure = useRef(0);
@@ -108,6 +119,15 @@ export function usePractice(options: PracticeOptions) {
   const color = useCallback(
     (step: Step, midis: number[], c: string) =>
       opts.current.scoreRef.current?.colorNotes(step.measure, step.onset, midis, c),
+    [],
+  );
+
+  /** Texto de espera para un paso: las notas, o una invitación a leer si se ocultan. */
+  const waitingText = useCallback(
+    (step: Step) =>
+      opts.current.revealExpected === false
+        ? t('practice.readAndPlay')
+        : t('practice.waiting', { notes: names(step) }),
     [],
   );
 
@@ -171,7 +191,10 @@ export function usePractice(options: PracticeOptions) {
         const total = hits + misses + extras;
         if (total) {
           const accuracy = hits / total;
-          void save(accuracy, durationMs, 'tempo');
+          const summary = s.evaluator.summary;
+          void save(accuracy, durationMs, 'tempo').then(() =>
+            opts.current.onTempoFinished?.(summary, completed),
+          );
           setFeedback({
             kind: completed ? 'ok' : 'info',
             text: t('practice.finished', {
@@ -183,6 +206,7 @@ export function usePractice(options: PracticeOptions) {
           setFeedback({ kind: 'info', text: readyText() });
         }
       }
+      setExpected([]);
       setStatus(completed ? 'finished' : 'idle');
     },
     [save],
@@ -194,19 +218,20 @@ export function usePractice(options: PracticeOptions) {
       const engine = new WaitModeEngine(steps, { chordWindowMs, loop: !!loop });
       const now = performance.now();
       engine.start(now);
-      session.current = { kind: 'wait', engine, startedAt: now, ok: 0, errors: 0 };
+      session.current = { kind: 'wait', engine, startedAt: now, ok: 0, errors: 0, stepErrors: 0 };
+      setExpected(steps[0].notes.map((n) => n.midi));
       score()?.toPosition(steps[0].measure, steps[0].onset);
       onMeasure(steps[0].measure);
       setStatus('running');
       setCounters(t('practice.counters.wait', { ok: 0, errors: 0 }));
-      setFeedback({ kind: 'info', text: t('practice.waiting', { notes: names(steps[0]) }) });
+      setFeedback({ kind: 'info', text: waitingText(steps[0]) });
     },
-    [score],
+    [score, waitingText],
   );
 
   const startTempo = useCallback(
     async (steps: Step[], range: Range) => {
-      const { score: model, bpm, toleranceMs, loop, onMeasure } = opts.current;
+      const { score: model, bpm, toleranceMs, loop, onMeasure, anyKey } = opts.current;
       audio.current ??= new AudioContext();
       await audio.current.resume();
       const starts = measureStarts(model);
@@ -221,6 +246,7 @@ export function usePractice(options: PracticeOptions) {
         toleranceMs,
         msPerQuarter,
         origin: starts[range.from],
+        anyKey,
       });
       evaluator.addPass(passStart);
       const metronome = new Metronome(audio.current);
@@ -334,6 +360,8 @@ export function usePractice(options: PracticeOptions) {
       const result = s.engine.noteOn(e.midi, e.time);
       if (result.type === 'wrong') {
         s.errors++;
+        s.stepErrors++;
+        const reveal = opts.current.revealExpected !== false || s.stepErrors >= 2;
         color(
           result.step,
           result.step.notes.map((n) => n.midi),
@@ -341,11 +369,15 @@ export function usePractice(options: PracticeOptions) {
         );
         setFeedback({
           kind: 'error',
-          text: t('practice.wrong', { played: midiToName(e.midi), expected: names(result.step) }),
+          text: reveal
+            ? t('practice.wrong', { played: midiToName(e.midi), expected: names(result.step) })
+            : t('practice.wrongTryAgain', { played: midiToName(e.midi) }),
         });
       } else if (result.type === 'partial') {
         setFeedback({ kind: 'info', text: t('practice.partial', { note: midiToName(e.midi) }) });
       } else if (result.type === 'advance') {
+        s.stepErrors = 0;
+        const name = opts.current.stepName?.(result.step);
         if (!result.hadErrors) {
           s.ok++;
           color(
@@ -358,9 +390,11 @@ export function usePractice(options: PracticeOptions) {
         if (result.next) {
           score()?.toPosition(result.next.measure, result.next.onset);
           opts.current.onMeasure(result.next.measure);
+          setExpected(result.next.notes.map((n) => n.midi));
+          const done = [result.hadErrors ? '' : t('practice.correct'), name ?? ''].filter(Boolean);
           setFeedback({
             kind: result.hadErrors ? 'info' : 'ok',
-            text: `${result.hadErrors ? '' : t('practice.correct') + ' · '}${t('practice.waiting', { notes: names(result.next) })}`,
+            text: [...done, waitingText(result.next)].join(' · '),
           });
         }
       }
@@ -391,5 +425,14 @@ export function usePractice(options: PracticeOptions) {
     startMeasure.current = m;
   }, []);
 
-  return { status, feedback, counters, countIn, start, stop, setStartMeasure };
+  return {
+    status,
+    feedback: feedback ?? { kind: 'info' as const, text: options.readyText ?? t('practice.ready') },
+    counters,
+    countIn,
+    expected,
+    start,
+    stop,
+    setStartMeasure,
+  };
 }

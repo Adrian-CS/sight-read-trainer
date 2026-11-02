@@ -16,7 +16,10 @@ PWA personal para aprender a leer partituras tocando un teclado MIDI (Yamaha por
   - Ejercicios de 16 negras generados como MusicXML y tocados en modo espera con el mismo pipeline (OSMD + `core/practice`).
   - Desbloqueo: si un ejercicio completo tiene ≥ 90 % de aciertos a la primera y una mediana de reacción ≤ 2 s, se añade la siguiente nota de la pista (posición de cinco dedos, después hacia fuera y por último las líneas adicionales).
   - Repetición espaciada: cada nota pesa más cuanto más se falla, más se tarda, menos se ha practicado o más tiempo hace que no sale.
-- Pendiente de la Fase 4: ejercicios de ritmo, intervalos y acordes. Siguiente gran bloque: Fase 5 (Spotify).
+  - **Ritmo** (5 niveles: redondas/blancas/negras → silencios → corcheas → puntillos → semicorcheas): figuras sobre Si4 con metrónomo; vale cualquier tecla. Se sube de nivel con ≥ 90 % de aciertos y ≤ 90 ms de desviación media.
+  - **Intervalos** (3 niveles: 3ª y 5ª → 2ª y 4ª → 6ª, 7ª y 8ª) y **acordes** (3 niveles: Do/Fa/Sol mayor → La/Re/Mi menor → inversiones): se tocan a la vez en modo espera (ventana de 400 ms) y al acertar se muestra su nombre. Se sube con ≥ 90 % y ≤ 3 s de reacción.
+  - En el curso no se muestra qué notas tocar: solo se revela después del segundo fallo en la misma nota.
+- Siguiente: Fase 5 (Spotify).
 
 ## Desarrollo
 
@@ -62,7 +65,7 @@ src/
     sync/       times(), measureAtTime(), fractionInMeasure()
     library/    importar, renombrar, piezas de ejemplo
     practice/   pasos esperados, motor de espera, evaluador de ritmo, metrónomo, estadísticas
-    exercises/  pistas del curso, generador de ejercicios, repetición espaciada, desbloqueo
+    exercises/  pistas del curso, generadores (notas, ritmo, intervalos, acordes), repetición espaciada, desbloqueo
     storage/    Repository + DexieRepository (IndexedDB)
   i18n/         textos (es.ts) y t()
 scripts/        generador del service worker, render de iconos

@@ -1,7 +1,7 @@
 .intro {
   max-width: 70ch;
   line-height: 1.5;
-  margin: 0 0 20px;
+  margin: 0 0 8px;
 }
 
 .tracks {
@@ -53,4 +53,9 @@
 
 .notes {
   font-size: 0.9rem;
+}
+
+.section {
+  font-size: 1.1rem;
+  margin: 24px 0 12px;
 }

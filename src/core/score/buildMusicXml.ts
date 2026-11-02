@@ -7,6 +7,8 @@
  *   "F#4:h."      blanca con puntillo de Fa♯4 (b = bemol: "Bb3:q")
  *   "C3+E3+G3:w"  acorde
  *   "r:q"         silencio
+ *   "B4:e~begin"  barra de corchea; con varias barras, una por nivel: "B4:s~begin,begin"
+ *                 (begin | continue | end | forward hook | backward hook)
  */
 
 const DIVISIONS = 4; // divisiones por negra: semicorchea = 1
@@ -39,15 +41,17 @@ type Token = {
   divisions: number;
   type: string;
   dot: boolean;
+  /** Estado de cada nivel de barra (1 = corchea, 2 = semicorchea). */
+  beams: string[];
 };
 
 const escapeXml = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 export function parseToken(token: string): Token {
-  const match = /^([^:]+):([whqes])(\.?)$/.exec(token);
+  const match = /^([^:]+):([whqes])(\.?)(?:~([a-z ,]+))?$/.exec(token);
   if (!match) throw new Error(`Figura no válida: "${token}"`);
-  const [, notes, dur, dot] = match;
+  const [, notes, dur, dot, beams] = match;
   const base = DURATIONS[dur];
   const pitches =
     notes === 'r'
@@ -66,6 +70,7 @@ export function parseToken(token: string): Token {
     divisions: dot ? (base.divisions * 3) / 2 : base.divisions,
     type: base.type,
     dot: !!dot,
+    beams: beams ? beams.split(',') : [],
   };
 }
 
@@ -73,7 +78,8 @@ function noteXml(token: Token, staff: number, voice: number, multiStaff: boolean
   const tail =
     `<duration>${token.divisions}</duration><voice>${voice}</voice><type>${token.type}</type>` +
     (token.dot ? '<dot/>' : '') +
-    (multiStaff ? `<staff>${staff}</staff>` : '');
+    (multiStaff ? `<staff>${staff}</staff>` : '') +
+    token.beams.map((b, i) => `<beam number="${i + 1}">${b}</beam>`).join('');
   if (token.pitches.length === 0) return `<note><rest/>${tail}</note>`;
   return token.pitches
     .map((p, i) => {

@@ -49,6 +49,19 @@ describe('buildMusicXml + parseScore', () => {
     ]);
   });
 
+  it('escribe barras de corcheas y semicorcheas', () => {
+    const xml = buildMusicXml({
+      title: 'b',
+      beats: 1,
+      beatType: 4,
+      keyFifths: 0,
+      right: ['B4:e~begin B4:s~continue,begin B4:s~end,end'],
+    });
+    expect(xml).toContain('<beam number="1">begin</beam>');
+    expect(xml).toContain('<beam number="2">end</beam>');
+    expect(parse(xml).measures[0].notes.map((n) => n.onset)).toEqual([0, 0.5, 0.75]);
+  });
+
   it('rechaza compases con duración incorrecta', () => {
     expect(() =>
       buildMusicXml({ title: 'x', beats: 4, beatType: 4, keyFifths: 0, right: ['C4:q'] }),
