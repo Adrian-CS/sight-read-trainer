@@ -15,6 +15,19 @@
   --key-border: #9a958c;
   --radius: 14px;
   --tap: 56px;
+  /* Gráficos: una sola serie azul y rampa secuencial de 5 pasos (validadas con el
+     validador de paletas: contraste del paso más claro >= 2:1 sobre la superficie). */
+  --chart-bar: #2a78d6;
+  --chart-grid: #e6e2da;
+  --heat-1: #86b6ef;
+  --heat-2: #5598e7;
+  --heat-3: #2a78d6;
+  --heat-4: #1c5cab;
+  --heat-5: #104281;
+  --heat-none: #b5b0a6;
+  /* Teclas sin datos en el mapa del teclado: neutras, para que el color solo signifique datos. */
+  --heatkey-white: #ffffff;
+  --heatkey-black: #3a3a3a;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,6 +43,17 @@
     --key-white: #e9e7e2;
     --key-black: #0c0d0f;
     --key-border: #4a4f57;
+    /* En oscuro, menos = más cerca del fondo; más = más claro. */
+    --chart-bar: #3987e5;
+    --chart-grid: #2c3035;
+    --heat-1: #1c5cab;
+    --heat-2: #2a78d6;
+    --heat-3: #5598e7;
+    --heat-4: #86b6ef;
+    --heat-5: #b7d3f6;
+    --heat-none: #5c626b;
+    --heatkey-white: #2a2e33;
+    --heatkey-black: #111316;
   }
 }
 

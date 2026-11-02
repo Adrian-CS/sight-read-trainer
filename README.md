@@ -25,7 +25,7 @@ PWA personal para aprender a leer partituras tocando un teclado MIDI (Yamaha por
   - Búsqueda de canciones o enlace pegado de open.spotify.com; por pieza se guardan `trackId`, `startMs` y `endMs`. «Escuchar fragmento» se para solo al final.
   - Sincronización (sección 6): tempo, «Compás 1 empieza aquí», «Fijar compás N aquí», Tap (marca el compás cuyo inicio está más cerca) y «Quitar marcas». Las marcas manuales llevan ⚑.
   - Mientras suena, una línea verde recorre la partitura y el compás que suena se resalta en las dos vistas (estado leído cada 250 ms e interpolado con `performance.now()`). Modo de depuración opcional: «lo que oyes» frente a «cursor de la app».
-- Siguiente: Fase 6 (estadísticas).
+- **Fase 6 (estadísticas, `/estadisticas/`):** racha actual y mejor racha (si hoy aún no has practicado, la racha sigue viva hasta medianoche), tiempo de hoy, de los últimos 7 días y total, precisión de los últimos 30 días; minutos por día de los últimos 28 días; mapas de calor del pentagrama (Sol y Fa) y del teclado por fallos o por tiempo de reacción, con 5 niveles fijos y leyenda; tabla de notas para repasar (mismo criterio que la repetición espaciada) y tabla completa.
 
 ## Desarrollo
 
@@ -73,7 +73,7 @@ el job `deploy` de `.github/workflows/ci.yml` publica `out/` con Wrangler si exi
 
 ```
 src/
-  app/          rutas (/, /curso/, /curso/leccion/?pista=…, /biblioteca/, /pieza/?id=…, /diagnostico/)
+  app/          rutas (/, /curso/, /curso/leccion/?pista=…, /biblioteca/, /pieza/?id=…, /estadisticas/, /diagnostico/, /spotify/callback/)
   components/   InputProvider, Keyboard, ScoreView (OSMD), MeasureGrid, MiniStaff, SegmentedControl…
   core/         lógica sin React, testeada con Vitest
     input/      NoteInput y sus implementaciones, parser MIDI
@@ -83,6 +83,7 @@ src/
     library/    importar, renombrar, piezas de ejemplo
     practice/   pasos esperados, motor de espera, evaluador de ritmo, metrónomo, estadísticas
     spotify/    PKCE, tokens, Web API, Web Playback SDK, reloj de reproducción
+    stats/      rachas, tiempo practicado, filas por nota y por tecla, niveles del mapa de calor
     exercises/  pistas del curso, generadores (notas, ritmo, intervalos, acordes), repetición espaciada, desbloqueo
     storage/    Repository + DexieRepository (IndexedDB)
   i18n/         textos (es.ts) y t()

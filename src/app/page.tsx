@@ -7,6 +7,7 @@ type Entry = { href?: string; title: MessageKey; hint: MessageKey };
 const ENTRIES: Entry[] = [
   { href: '/curso/', title: 'home.course', hint: 'home.courseHint' },
   { href: '/biblioteca/', title: 'home.library', hint: 'home.libraryHint' },
+  { href: '/estadisticas/', title: 'home.stats', hint: 'home.statsHint' },
   { href: '/diagnostico/', title: 'home.diagnostics', hint: 'home.diagnosticsHint' },
 ];
 

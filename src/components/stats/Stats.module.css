@@ -1,0 +1,226 @@
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+}
+
+.tileValue {
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  white-space: nowrap;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.tileSub {
+  font-size: 0.85rem;
+}
+
+.section {
+  margin-bottom: 16px;
+}
+
+.section h2 {
+  font-size: 1.15rem;
+  margin: 0 0 4px;
+}
+
+.section h3 {
+  font-size: 0.95rem;
+  margin: 16px 0 4px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.section > p,
+.sectionHead p {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+}
+
+.sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* Gráfico de columnas */
+.chart {
+  position: relative;
+  width: 100%;
+}
+
+.chart svg {
+  display: block;
+}
+
+.grid {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.baseline {
+  stroke: var(--muted);
+  stroke-width: 1;
+}
+
+.axis {
+  fill: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.value {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  fill: var(--chart-bar);
+}
+
+.barActive {
+  fill: var(--heat-4);
+}
+
+.tooltip {
+  position: absolute;
+  width: 160px;
+  pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Mapas de calor */
+.staff,
+.keys {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.keys {
+  max-height: 160px;
+}
+
+.staffLine {
+  stroke: var(--muted);
+  stroke-opacity: 0.6;
+  stroke-width: 1;
+}
+
+.clefLabel {
+  fill: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.noteLabel,
+.keyLabel {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.whiteKey {
+  stroke: var(--heat-none);
+  stroke-width: 1;
+}
+
+.blackKey {
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.staff g[role='button']:focus,
+.keys g[role='button']:focus {
+  outline: none;
+}
+
+.staff g[role='button']:focus-visible ellipse,
+.keys g[role='button']:focus-visible rect {
+  stroke: var(--text);
+  stroke-width: 2;
+}
+
+.legend {
+  list-style: none;
+  margin: 0 0 4px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.swatchNone {
+  border: 1.5px dashed var(--heat-none);
+}
+
+.detail {
+  min-height: 1.5em;
+  margin: 12px 0 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tablas */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table thead th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.more {
+  margin-top: 12px;
+}
+
+.more summary {
+  cursor: pointer;
+  color: var(--muted);
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
