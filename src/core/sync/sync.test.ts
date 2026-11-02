@@ -57,3 +57,27 @@ describe('utilidades', () => {
     });
   });
 });
+
+describe('marcas', () => {
+  it('Tap elige el compás cuyo inicio está más cerca', async () => {
+    const { nearestMeasureStart } = await import('./sync');
+    const t = times(base, 4); // 1000, 3000, 5000, 7000, 9000
+    expect(nearestMeasureStart(t, 2900)).toBe(1);
+    expect(nearestMeasureStart(t, 4100)).toBe(2);
+    expect(nearestMeasureStart(t, 0)).toBe(0);
+    expect(nearestMeasureStart(t, 20000)).toBe(3);
+  });
+
+  it('fija compases y descarta marcas desordenadas', async () => {
+    const { setMark, clearMarks } = await import('./sync');
+    let s = setMark(base, 4, 12000);
+    s = setMark(s, 2, 6000);
+    expect(s.marks).toEqual({ 2: 6000, 4: 12000 });
+    s = setMark(s, 3, 5000); // antes que el 2: el 2 sobra
+    expect(s.marks).toEqual({ 3: 5000, 4: 12000 });
+    s = setMark(s, 0, 2000);
+    expect(s).toMatchObject({ startOffsetMs: 2000, marks: { 3: 5000, 4: 12000 } });
+    expect(setMark(s, 1, 1500).startOffsetMs).toBe(0); // el inicio no puede quedar después
+    expect(clearMarks(s).marks).toEqual({});
+  });
+});

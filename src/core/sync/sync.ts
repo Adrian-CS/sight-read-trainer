@@ -82,3 +82,40 @@ export function defaultSync(opts: {
     marks: {},
   };
 }
+
+/**
+ * Compás cuyo comienzo está más cerca de `ms` según el cálculo actual. Lo usa el botón Tap:
+ * cada toque marca el inicio de la frase que acaba de empezar.
+ */
+export function nearestMeasureStart(measureTimes: number[], ms: number): number {
+  const count = measureTimes.length - 1;
+  if (count <= 0) return 0;
+  let best = 0;
+  for (let i = 1; i < count; i++) {
+    if (Math.abs(measureTimes[i] - ms) < Math.abs(measureTimes[best] - ms)) best = i;
+  }
+  return best;
+}
+
+/**
+ * Fija el compás `measure` en `ms`. El compás 0 es el inicio de la pieza en la canción.
+ * Se descartan las marcas que quedarían desordenadas (un compás posterior antes en el tiempo).
+ */
+export function setMark(sync: SyncData, measure: number, ms: number): SyncData {
+  const t = Math.max(0, Math.round(ms));
+  const marks: Record<number, number> = {};
+  for (const [k, v] of Object.entries(sync.marks)) {
+    const m = Number(k);
+    if (m === measure || m === 0) continue;
+    if ((m > measure && v <= t) || (m < measure && v >= t)) continue;
+    marks[m] = v;
+  }
+  if (measure === 0) return { ...sync, startOffsetMs: t, marks };
+  // Si el inicio quedaría después de esta marca, se lleva al principio.
+  const startOffsetMs = sync.startOffsetMs >= t ? 0 : sync.startOffsetMs;
+  return { ...sync, startOffsetMs, marks: { ...marks, [measure]: t } };
+}
+
+export function clearMarks(sync: SyncData): SyncData {
+  return { ...sync, marks: {} };
+}

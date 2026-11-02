@@ -1,0 +1,117 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 16px;
+  margin-bottom: 8px;
+}
+
+.panel p {
+  margin: 0;
+}
+
+.row,
+.search,
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.brand {
+  font-weight: 700;
+  color: #1db954;
+}
+
+.cover {
+  border-radius: 6px;
+  flex: none;
+  object-fit: cover;
+}
+
+.track {
+  flex: 1 1 200px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transport {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.position,
+.bpm {
+  min-width: 6ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.search .input {
+  flex: 1 1 280px;
+}
+
+.results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.results li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.details summary {
+  cursor: pointer;
+  color: var(--muted);
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.details[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hint {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  max-width: 80ch;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+}
+
+.toggle input {
+  width: 22px;
+  height: 22px;
+}
+
+.message,
+.debug {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.settings {
+  margin-bottom: 12px;
+}

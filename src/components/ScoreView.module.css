@@ -68,3 +68,27 @@
   margin: 0;
   color: #6b665e;
 }
+
+.measure {
+  /* La cabecera fija de la pieza no debe tapar el compás al desplazarse hasta él. */
+  scroll-margin-top: calc(var(--sticky-height, 300px) + 16px);
+  scroll-margin-bottom: 40px;
+}
+
+.measure.playing {
+  background: rgba(31, 157, 85, 0.1);
+}
+
+.playhead {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: #1f9d55;
+  pointer-events: none;
+  z-index: 2;
+  display: none;
+  will-change: transform;
+}

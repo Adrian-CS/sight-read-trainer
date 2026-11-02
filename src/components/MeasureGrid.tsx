@@ -13,6 +13,8 @@ type Props = {
   currentMeasure: number;
   visible: boolean;
   loop?: { from: number; to: number } | null;
+  /** Compás que suena en la canción. */
+  playheadMeasure?: number | null;
   onSelectMeasure(index: number): void;
 };
 
@@ -23,6 +25,7 @@ export function MeasureGrid({
   currentMeasure,
   visible,
   loop,
+  playheadMeasure = null,
   onSelectMeasure,
 }: Props) {
   const gridRef = useRef<HTMLOListElement>(null);
@@ -34,6 +37,12 @@ export function MeasureGrid({
     el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, [currentMeasure, visible]);
 
+  useEffect(() => {
+    if (!visible || playheadMeasure === null) return;
+    const el = gridRef.current?.children[playheadMeasure] as HTMLElement | undefined;
+    el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [playheadMeasure, visible]);
+
   return (
     <ol ref={gridRef} className={styles.grid} hidden={!visible}>
       {score.measures.map((measure, i) => (
@@ -41,8 +50,8 @@ export function MeasureGrid({
           <button
             type="button"
             className={`${styles.cell} ${i === currentMeasure ? styles.current : ''} ${
-              loop && i >= loop.from && i <= loop.to ? styles.inLoop : ''
-            }`}
+              i === playheadMeasure ? styles.playing : ''
+            } ${loop && i >= loop.from && i <= loop.to ? styles.inLoop : ''}`}
             aria-pressed={i === currentMeasure}
             aria-label={t('piece.measure', { n: labels[i]?.number ?? i + 1 })}
             onClick={() => onSelectMeasure(i)}

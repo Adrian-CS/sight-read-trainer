@@ -14,6 +14,8 @@ export type ScoreViewHandle = {
   /** Colorea las notas con esas teclas que empiezan en ese instante. */
   colorNotes(measure: number, onset: number, midis: number[], color: string): void;
   clearColors(): void;
+  /** Línea de reproducción dentro de un compás (0-1); null para ocultarla. */
+  setPlayhead(measure: number | null, fraction?: number): void;
 };
 
 /** OSMD guarda la altura en semitonos con Do4 = 48; en MIDI Do4 = 60. */
@@ -35,6 +37,8 @@ type Props = {
   labels: MeasureLabel[];
   /** Dibujar el título de la partitura (los ejercicios no tienen). */
   showTitle?: boolean;
+  /** Compás que suena en la canción (Spotify): se resalta y se mantiene a la vista. */
+  playheadMeasure?: number | null;
   /** Compases del bucle (incluidos), para resaltarlos. */
   loop?: { from: number; to: number } | null;
   onSelectMeasure(index: number): void;
@@ -86,6 +90,7 @@ export function ScoreView({
   currentMeasure,
   labels,
   showTitle = true,
+  playheadMeasure = null,
   loop,
   onSelectMeasure,
   onCursorMeasure,
@@ -96,6 +101,12 @@ export function ScoreView({
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [boxes, setBoxes] = useState<Box[]>([]);
+  const boxesRef = useRef<Box[]>([]);
+  const playheadRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    boxesRef.current = boxes;
+  }, [boxes]);
   const rendered = useRef({ width: 0, zoom: 0 });
   /** Posición del cursor en negras desde el inicio, para restaurarla tras volver a maquetar. */
   const cursorTime = useRef(0);
@@ -204,6 +215,15 @@ export function ScoreView({
     };
   }, [layout]);
 
+  // Mantener a la vista el compás que suena en la canción.
+  useEffect(() => {
+    if (playheadMeasure === null || !visible) return;
+    const el = overlayRef.current?.querySelector<HTMLElement>(
+      `[data-measure="${playheadMeasure}"]`,
+    );
+    el?.scrollIntoView({ block: 'nearest' });
+  }, [playheadMeasure, visible]);
+
   useImperativeHandle(ref, () => {
     const step = (dir: 1 | -1) => {
       const cursor = osmdRef.current?.cursor;
@@ -255,6 +275,18 @@ export function ScoreView({
           }
         }
       },
+      setPlayhead(measure, fraction = 0) {
+        const el = playheadRef.current;
+        const box = measure === null ? undefined : boxesRef.current[measure];
+        if (!el) return;
+        if (!box || box.width === 0) {
+          el.style.display = 'none';
+          return;
+        }
+        el.style.display = 'block';
+        el.style.transform = `translate(${box.left + fraction * box.width}px, ${box.top}px)`;
+        el.style.height = `${box.height}px`;
+      },
       clearColors() {
         colored.current.forEach((el) => {
           el.style.fill = '';
@@ -275,15 +307,17 @@ export function ScoreView({
       )}
       <div className={styles.stage}>
         <div ref={hostRef} />
-        <div className={styles.overlay}>
+        <div className={styles.overlay} ref={overlayRef}>
+          <div ref={playheadRef} className={styles.playhead} hidden={playheadMeasure === null} />
           {boxes.map((box, i) =>
             box.width > 0 ? (
               <button
                 key={i}
                 type="button"
+                data-measure={i}
                 className={`${styles.measure} ${i === currentMeasure ? styles.current : ''} ${
-                  loop && i >= loop.from && i <= loop.to ? styles.inLoop : ''
-                }`}
+                  i === playheadMeasure ? styles.playing : ''
+                } ${loop && i >= loop.from && i <= loop.to ? styles.inLoop : ''}`}
                 style={box}
                 aria-label={t('piece.measure', { n: labels[i]?.number ?? i + 1 })}
                 aria-pressed={i === currentMeasure}

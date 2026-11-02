@@ -20,7 +20,16 @@ export type Piece = {
   sampleId?: string;
   musicXml: string | Blob;
   createdAt: number;
-  spotify?: { trackId: string; startMs: number; endMs: number };
+  spotify?: {
+    trackId: string;
+    startMs: number;
+    endMs: number;
+    /** Datos de la canción para mostrarla sin volver a pedirlos a Spotify. */
+    name?: string;
+    artists?: string[];
+    imageUrl?: string | null;
+    durationMs?: number;
+  };
   sync?: SyncData;
   hand: Hand;
   /** Tempo elegido para practicar con metrónomo (negras por minuto). */
@@ -56,6 +65,13 @@ export type Settings = {
   hand: Hand;
   /** Ya se añadieron las piezas de ejemplo (para no volver a crearlas si se borran). */
   samplesSeeded: boolean;
+  /** Sesión de Spotify (tokens OAuth con PKCE). */
+  spotifyAuth: {
+    accessToken: string;
+    refreshToken: string;
+    expiresAt: number;
+    scope: string;
+  } | null;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -65,6 +81,7 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: 'auto',
   hand: 'both',
   samplesSeeded: false,
+  spotifyAuth: null,
 };
 
 /** Progreso de una pista del curso: cuántas notas de su orden están desbloqueadas. */

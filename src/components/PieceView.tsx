@@ -14,6 +14,7 @@ import { t } from '@/i18n';
 import { Keyboard } from './Keyboard';
 import { MeasureGrid } from './MeasureGrid';
 import { PracticeBar } from './practice/PracticeBar';
+import { SpotifyPanel } from './spotify/SpotifyPanel';
 import { usePractice, type PracticeMode } from './practice/usePractice';
 import { ScoreView, type MeasureLabel, type ScoreViewHandle } from './ScoreView';
 import { SegmentedControl } from './SegmentedControl';
@@ -101,20 +102,24 @@ export function PieceView() {
     };
   }, [id]);
 
-  const labels = useMemo<MeasureLabel[]>(() => {
-    if (!data || data === 'missing') return [];
+  const timing = useMemo(() => {
+    if (!data || data === 'missing') return null;
     const { piece, score } = data;
     const first = score.measures[0];
     const sync =
       piece.sync ??
       defaultSync({ tempo: score.tempo, beats: first?.beats ?? 4, beatType: first?.beatType ?? 4 });
-    const starts = times(sync, score.measures.length);
-    return score.measures.map((m, i) => ({
-      number: m.number,
-      time: formatMs(starts[i]),
-      manual: sync.marks[i] !== undefined,
-    }));
+    return { sync, starts: times(sync, score.measures.length) };
   }, [data]);
+
+  const labels = useMemo<MeasureLabel[]>(() => {
+    if (!data || data === 'missing' || !timing) return [];
+    return data.score.measures.map((m, i) => ({
+      number: m.number,
+      time: formatMs(timing.starts[i]),
+      manual: timing.sync.marks[i] !== undefined,
+    }));
+  }, [data, timing]);
 
   const changeMode = (next: Mode) => {
     setMode(next);
@@ -148,8 +153,25 @@ export function PieceView() {
     [practicing],
   );
 
-  /** Guarda un cambio en la pieza (mano o tempo por defecto). */
-  const updatePiece = (patch: { hand?: Hand; practiceBpm?: number }) => {
+  const [playheadMeasure, setPlayheadMeasure] = useState<number | null>(null);
+  const [spotifySettings, setSpotifySettings] = useState<HTMLDivElement | null>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+
+  // Altura de la cabecera fija, para que el desplazamiento automático no deje compases debajo.
+  useEffect(() => {
+    const el = stickyRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() =>
+      document.documentElement.style.setProperty('--sticky-height', `${el.offsetHeight}px`),
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [data]);
+
+  /** Guarda un cambio en la pieza (mano, tempo de práctica, canción o sincronización). */
+  const updatePiece = (
+    patch: Partial<Pick<Piece, 'hand' | 'practiceBpm' | 'spotify' | 'sync'>>,
+  ) => {
     if (!loaded) return;
     const piece = { ...loaded.piece, ...patch };
     setData({ ...loaded, piece });
@@ -202,7 +224,7 @@ export function PieceView() {
         />
       </TopBar>
 
-      <div className={styles.sticky}>
+      <div className={styles.sticky} ref={stickyRef}>
         <div className={styles.toolbar}>
           <button
             type="button"
@@ -299,7 +321,23 @@ export function PieceView() {
             });
           }}
         />
+        {timing && (
+          <SpotifyPanel
+            piece={data.piece}
+            sync={timing.sync}
+            measureTimes={timing.starts}
+            currentMeasure={current}
+            measureLabel={(i) => labels[i]?.number ?? String(i + 1)}
+            scoreRef={scoreRef}
+            disabled={practicing}
+            onChange={updatePiece}
+            onPlayhead={setPlayheadMeasure}
+            settingsContainer={spotifySettings}
+          />
+        )}
       </div>
+
+      <div ref={setSpotifySettings} />
 
       {/* Las dos vistas siguen montadas: cambiar de modo no pierde cursor ni maquetación. */}
       <ScoreView
@@ -311,6 +349,7 @@ export function PieceView() {
         currentMeasure={current}
         labels={labels}
         loop={loop}
+        playheadMeasure={playheadMeasure}
         onSelectMeasure={selectMeasure}
         onCursorMeasure={setCurrent}
       />
@@ -320,6 +359,7 @@ export function PieceView() {
         currentMeasure={current}
         visible={mode === 'measures'}
         loop={loop}
+        playheadMeasure={playheadMeasure}
         onSelectMeasure={selectMeasure}
       />
 

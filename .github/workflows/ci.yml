@@ -44,6 +44,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy out --project-name=sightread-trainer --branch=main
+          command: pages deploy out --project-name=sight-read-trainer --branch=main
       - if: env.HAS_CF != 'true'
         run: echo "Sin secretos de Cloudflare; se omite el despliegue."

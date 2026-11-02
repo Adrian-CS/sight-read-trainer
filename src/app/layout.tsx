@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { InputProvider } from '@/components/InputProvider';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
+import { SpotifyProvider } from '@/components/spotify/SpotifyProvider';
 import { t } from '@/i18n';
 import './globals.css';
 
@@ -26,7 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body>
-        <InputProvider>{children}</InputProvider>
+        <InputProvider>
+          <SpotifyProvider>{children}</SpotifyProvider>
+        </InputProvider>
         <ServiceWorkerRegistration />
       </body>
     </html>
